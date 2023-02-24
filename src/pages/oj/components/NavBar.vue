@@ -48,6 +48,41 @@
       </Submenu>
       <template v-if="!isAuthenticated">
         <div class="btn-menu">
+          <Submenu name="noti" v-if="isAuthenticated">
+            <template slot="title">
+              <Icon type="md-notifications" style="font-size: 24px; border-style: none;"/>
+            </template>
+            <Menu-item >
+              <transition-group name="announcement-animate" mode="in-out">
+                <div class="no-announcement" v-if="!announcements.length" key="no-announcement">
+                  <p>{{$t('m.No_Announcements')}}</p>
+                </div>
+                <template v-if="listVisible">
+                  <ul class="announcements-container" key="list">
+                    <li v-for="announcement in announcements" :key="announcement.title">
+                      <div class="flex-container">
+                        <div class="title"><a class="entry" @click="goAnnouncement(announcement)">
+                          <Icon type="md-bookmark" /> {{announcement.title}}</a></div>
+                        <div class="date">{{announcement.create_time | localtime }}</div>
+                        <div class="creator"> {{$t('m.By')}} {{announcement.created_by.username}}</div>
+                      </div>
+                    </li>
+                  </ul>
+                  <Pagination v-if="!isContest"
+                              key="page"
+                              :total="total"
+                              :page-size="limit"
+                              @on-change="getAnnouncementList">
+                  </Pagination>
+                </template>
+
+                <template v-else>
+                <div v-katex v-html="announcement.content" key="content" class="content-container markdown-body"></div>
+                </template>
+              </transition-group>
+            </Menu-item>
+            
+          </Submenu>
           <Button
                   ref="loginBtn"
                   shape="circle"
@@ -79,7 +114,7 @@
         </Dropdown>
       </template>
     </Menu>
-    <Modal v-model="modalVisible" :width="400">
+    <Modal v-model="modalVisible" :width="400" background="red">
       <div slot="header" class="modal-title">{{$t('m.Welcome_to')}} {{website.website_name_shortcut}}</div>
       <component :is="modalStatus.mode" v-if="modalVisible"></component>
       <div slot="footer" style="display: none"></div>
@@ -89,19 +124,37 @@
 
 <script>
   import { mapGetters, mapActions } from 'vuex'
+  import api from '@oj/api'
   import login from '@oj/views/user/Login'
   import register from '@oj/views/user/Register'
-
+  import Pagination from '@oj/components/Pagination'
   export default {
     components: {
       login,
-      register
+      register,
+      Pagination
+    },
+    data () {
+      return {
+        announcements: [],
+        announcement: '',
+        listVisible: true
+      }
     },
     mounted () {
       this.getProfile()
+      this.init()
     },
     methods: {
       ...mapActions(['getProfile', 'changeModalStatus']),
+      init () {
+        if (this.isContest) {
+          this.containerSpan = 24
+          this.getContestAnnouncementList()
+        } else {
+          this.getAnnouncementList()
+        }
+      },
       handleRoute (route) {
         if (route && route.indexOf('blog') >= 0) {
           window.open('https://www.facebook.com/he1deng', '_blank')
@@ -111,19 +164,34 @@
           window.open('/admin/')
         }
       },
+      getAnnouncementList (page = 1) {
+        api.getAnnouncementList((page - 1) * this.limit, this.limit).then(res => {
+          this.announcements = res.data.data.results
+          this.total = res.data.data.total
+        }, () => {
+        })
+      },
+      getContestAnnouncementList () {
+        api.getContestAnnouncementList(this.$route.params.contestID).then(res => {
+          this.announcements = res.data.data
+        }, () => {
+        })
+      },
+      goAnnouncement (announcement) {
+        this.announcement = announcement
+        this.listVisible = false
+      },
       handleBtnClick (mode) {
         this.changeModalStatus({
           visible: true,
           mode: mode
         })
       },
-      // 更换主题
       switchChange (status) {
         let params = document.getElementById('app')
         params.className = 'theme' + status
         window.localStorage.setItem('app', document.getElementById('app').className)
       },
-      // 存储主题颜色
       localStorageDate () {
         let memoryColor = window.localStorage.getItem('app')
         let params = document.getElementById('app')
@@ -132,7 +200,6 @@
     },
     computed: {
       ...mapGetters(['website', 'modalStatus', 'user', 'profile', 'isAuthenticated', 'isAdminRole', 'color', 'gradename']),
-      // 跟随路由变化
       activeMenu () {
         return '/' + this.$route.path.split('/')[1]
       },
@@ -151,7 +218,10 @@
   }
 </script>
 
-<style lang="less" scoped>
+<style lang="less" >
+  @media only screen and (max-width: 600px)  {
+    
+  }
   #header {
     min-width: 300px;
     position: fixed;
@@ -203,7 +273,11 @@
     &-title {
       font-size: 18px;
       font-weight: 600;
+      color: #fff;
     }
   }
-  
+  .ivu-modal-content{
+    background-image: url('../../../../static/img/background.png');
+    background-size: cover;
+  }
 </style>

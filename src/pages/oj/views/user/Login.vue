@@ -25,6 +25,18 @@
         :loading="btnLoginLoading">
         {{$t('m.UserLogin')}}
       </Button>
+      <el-row class="row-icon">
+        <el-col>
+          <img src="../../../../../static/img/GoogleLogo.png" class="logo-icon"/>
+        </el-col>
+        <el-col>
+          <img src="../../../../../static/img/FacebookLogo.png" style="width: 30px;height: 30px;"/>
+        </el-col>
+        <el-col>
+          <img src="../../../../../static/img/GithubLogo.png" class="logo-icon"/>
+        </el-col>
+      </el-row>
+      <br>
       <a v-if="website.allow_register" @click.stop="handleBtnClick('register')">{{$t('m.No_Account')}}</a>
       <a @click.stop="goResetPassword" style="float: right">{{$t('m.Forget_Password')}}</a>
     </div>
@@ -123,5 +135,20 @@
         margin: 0;
       }
     }
+    a{
+      color: aliceblue;
+    }
+  }
+  .logo-icon{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%
+  }
+
+  .row-icon{
+    margin: auto;
+    display: flex;
+    justify-content: space-around;
+    width: 60%;
   }
 </style>

@@ -1,10 +1,10 @@
 <template>
   <div id="app">
-    <NavBar></NavBar>
-	<vue-canvas-nest :config="{color:'0,117,169', count: 200, opacity: 0.7, pointColor: '0,0,0', zIndex: -2}" :el="'.content-app'"></vue-canvas-nest>
+    <NavBar/>
+	  <vue-canvas-nest :config="{color:'0,117,169', count: 200, opacity: 0.7, pointColor: '0,0,0', zIndex: -2}" :el="'.content-app'"></vue-canvas-nest>
     <div class="content-app theme1">
       <transition name="fadeInUp" mode="out-in">
-        <router-view></router-view>
+        <router-view/>
       </transition>
       <div class="footer">
         <!-- <p v-html="website.website_footer"></p> -->
@@ -19,7 +19,7 @@
         <p> Copyright © 2022 <a href="/">DQ Online Judge</a> &nbsp;-&nbsp; Powered by <a target="_blank" rel="nofollow noopener noreferrer" href="https://www.facebook.com/he1deng">Team DQ</a></p>
       </div>
     </div>
-	<BackTop></BackTop>
+	<BackTop/>
   </div>
 </template>
 
@@ -65,7 +65,9 @@
 </script>
 
 <style lang="less">
-
+   @media only screen and (max-width: 600px)  {
+    
+  }
   * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;

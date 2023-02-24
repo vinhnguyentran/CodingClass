@@ -1,49 +1,13 @@
 <template>
   <Row type="flex" :gutter="18">
     <Col :span="containerSpan">
-      <Panel shadow :padding="10" >
-        <div slot="title">
-          <Icon type="md-notifications" /> {{title}}
-        </div>
-        <div slot="extra">
-          <Button v-if="listVisible" type="info" @click="init" :loading="btnLoading"><span class="ivu-icon ivu-icon-ios-refresh"></span> {{$t('m.Refresh')}}</Button>
-          <Button v-else icon="ios-undo" @click="goBack">{{$t('m.Back')}}</Button>
-        </div>
-        <transition-group name="announcement-animate" mode="in-out">
-          <div class="no-announcement" v-if="!announcements.length" key="no-announcement">
-            <p>{{$t('m.No_Announcements')}}</p>
-          </div>
-          <template v-if="listVisible">
-            <ul class="announcements-container" key="list">
-              <li v-for="announcement in announcements" :key="announcement.title">
-                <div class="flex-container">
-                  <div class="title"><a class="entry" @click="goAnnouncement(announcement)">
-                    <Icon type="md-bookmark" /> {{announcement.title}}</a></div>
-                  <div class="date">{{announcement.create_time | localtime }}</div>
-                  <div class="creator"> {{$t('m.By')}} {{announcement.created_by.username}}</div>
-                </div>
-              </li>
-            </ul>
-            <Pagination v-if="!isContest"
-                        key="page"
-                        :total="total"
-                        :page-size="limit"
-                        @on-change="getAnnouncementList">
-            </Pagination>
-          </template>
-
-          <template v-else>
-          <div v-katex v-html="announcement.content" key="content" class="content-container markdown-body"></div>
-          </template>
-        </transition-group>
-      </Panel>
-      <Row v-if="!isContest" type="flex" :gutter="10" style="margin-top: 70px;">
-            <Col  :span="12">
+      <Row v-if="!isContest" type="flex" :gutter="10" style="margin-top: 0px;">
+            <Col :span="12">
               <Panel shadow style="padding-top: 0px;padding-bottom: 10px;">
                 <div slot="title" style="margin-left: -10px;margin-bottom: -10px;"><Icon type="md-document" /> Bài tập mới</div>
                 <ul style="margin-left: 40px;margin-bottom: 20px;">
                   <li style="padding: 5px 0px;"  v-for="p in problemList" :key="p.id">
-                    <a class="link-style" :href="'/problem/' + p._id">{{p._id}} - {{p.title}}</a>
+                    <a class="link-style" :href="'/problem/' + p._id">{{p._id}} - {{p.title}}  <Button class="news_noti" v-if="p.create_time == maxDate">News</Button></a>
                   </li>
                 </ul>
               </Panel>
@@ -96,6 +60,7 @@
       </Panel>
     </Col>
   </Row>
+  
 </template>
 
 <script>
@@ -110,11 +75,13 @@
     },
     data () {
       return {
+        maxDate: '',
         limit: 10,
         total: 10,
         tagList: [],
         problemList: [],
         problemLimit: 15,
+        i: 1,
         query: {
           keyword: '',
           difficulty: '',
@@ -170,11 +137,29 @@
           })
         })
       },
+      getMaxDate (dates) {
+        let newArr = []
+        for (let i = 1; i < dates.length; i++) {
+          newArr.push(dates[i].create_time)
+        }console.log('log2', newArr)
+        this.maxDate = new Date(Math.max(...newArr.map(element => {
+          // console.log('log', new Date(element.create_time))
+          return new Date(element.create_time)
+        })
+        ))
+      },
+      fDate (s) {
+        s = s.split('T')
+        // console.log('log --- 1', s)
+        return s[0]
+      },
       getProblemList () {
         let offset = 0
         api.getProblemList(offset, this.problemLimit, this.query).then(res => {
           this.problemList = res.data.data.results
           this.problem_count = res.data.data.total
+          // console.log('log', this.problemList)
+          this.getMaxDate(res.data.data.results)
         })
       },
       getAnnouncementList (page = 1) {
@@ -270,6 +255,15 @@
 </script>
 
 <style scoped lang="less">
+  .news_noti{
+    width: auto;
+    height: 20px;
+    font-size: 12px;
+    background-color: rgba(1, 172, 1, 0.87);
+    color: rgba(247, 247, 7, 0.918);
+    border-radius: 10px;
+    border-style: none;
+  }
   .announcements-container {
     margin-top: -10px;
     margin-bottom: 10px;

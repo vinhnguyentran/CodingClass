@@ -8,7 +8,7 @@
   <div class="flex-container">
     <div id="problem-main">
       <!--problem main-->
-      <Panel :padding="40" shadow>
+      <Panel :padding="40" shadow style="width: 50vw;">
         <div class="report"><a title="Báo lỗi bài tập này" target="_blank" onclick="event.preventDefault();window.open('https://www.facebook.com/he1deng', '_blank');" rel="noreferrer nofollow noopener"><i class="ivu-icon ivu-icon-md-bug"></i> {{$t('m.Report')}}</a></div>
         <h2 slot="title" class="problem-title">{{problem._id}} - {{problem.title}}</h2>
         <div id="problem-content" class="markdown-body" v-katex>
@@ -115,6 +115,19 @@
             </Button>
           </Col>
         </Row>
+        <Card style="margin-top: 100%;" :padding="10" v-if="!this.contestID || OIContestRealTimePermission">
+        <div slot="title" style="font-size: 16px;"><i data-v-20c86fbe="" class="ivu-icon ivu-icon-md-heart" style="color: red; font-size:1.2em;"></i>
+        <span class="card-title">Ủng hộ team DQ</span>
+        </div>
+        Ủng hộ 10.000đ giúp chúng tôi phát triển website hơn nữa:
+        <ul style="margin-left: 20px;margin-bottom: 10px;">
+          <li style="padding: 5px 0px;"><span style="color: green;">BIDV</span>: Nguyễn Hải Đăng, STK: 63510001079790</li>
+          <li style="padding: 5px 0px;"><span style="color: green;">BIDV</span>: Đào Thế Quân, STK: 63510001062301</li>
+          <!-- <li style="padding: 5px 0px;"><span style="color: green;">MoMo</span>: <a style="color: #495060;" target="_blank" href="https://me.momo.vn/nguyenvanhieu">me.momo.vn/nguyenvanhieu</a></li>
+          <li style="padding: 5px 0px;"><span style="color: green;">Paypal</span>: <a style="color: #495060;" target="_blank" href="https://www.paypal.me/nguyenvanhieuvn">paypal.me/nguyenvanhieuvn</a></li> -->
+        </ul>
+        Nếu thấy website hữu ích, hãy chia sẻ tới bạn bè để cùng nhau học tập và tiến bộ mỗi ngày nhé!
+      </Card>
       </Card>
       <!-- <Card :padding="20" dis-hover>
         <h3 style="font-size: 20px;">Bình luận</h3>
@@ -134,8 +147,8 @@
         <script type="application/javascript" src="https://utteranc.es/client.js" repo="luyencode/comments" issue-term="url" theme="github-light" crossorigin="anonymous" async> </script>
       </Card> -->
     </div>
-    <div id="right-column">
-      <VerticalMenu @on-click="handleRoute" style="cursor: pointer;">
+    <div id="sub-content">
+      <VerticalMenu @on-click="handleRoute" style="cursor: pointer; width: 25%; height: 500px;">
         <template v-if="this.contestID">
           <VerticalMenu-item :route="{name: 'contest-problem-list', params: {contestID: contestID}}">
             <Icon type="ios-photos"></Icon>
@@ -172,7 +185,7 @@
         </template>
       </VerticalMenu>
 
-      <Card id="info">
+      <Card id="info" style="width: 25%; height: 500px;">
         <div slot="title" class="header">
           <Icon type="md-information-circle"></Icon>
           <span class="card-title">{{$t('m.Information_Problem')}}</span>
@@ -216,7 +229,7 @@
         </ul>
       </Card>
 
-      <Card id="pieChart" :padding="0" v-if="!this.contestID || OIContestRealTimePermission">
+      <Card id="pieChart" :padding="0" v-if="!this.contestID || OIContestRealTimePermission" style="width: 25%; height: 500px;">
         <div slot="title">
           <Icon type="ios-analytics"></Icon>
           <span class="card-title">{{$t('m.Statistic')}}</span>
@@ -226,7 +239,7 @@
           <ECharts :options="pie"></ECharts>
         </div>
       </Card>
-      <Card style="margin-top: 20px;" :padding="0" v-if="!this.contestID || OIContestRealTimePermission">
+      <Card style="width: 25%; height: 500px;" :padding="0" v-if="!this.contestID || OIContestRealTimePermission">
         <div slot="title" style="font-size: 16px"><i data-v-20c86fbe="" class="ivu-icon ivu-icon-md-document"></i>
         <span class="card-title">Bài tập tương tự</span>
         </div>
@@ -235,19 +248,6 @@
             <a class="link-style" :href="'/problem/' + p._id">{{p._id}} - {{p.title}}</a>
           </li>
         </ul>
-      </Card>
-      <Card style="margin-top: 20px;" :padding="10" v-if="!this.contestID || OIContestRealTimePermission">
-        <div slot="title" style="font-size: 16px;"><i data-v-20c86fbe="" class="ivu-icon ivu-icon-md-heart" style="color: red; font-size:1.2em;"></i>
-        <span class="card-title">Ủng hộ team DQ</span>
-        </div>
-        Ủng hộ 10.000đ giúp chúng tôi phát triển website hơn nữa:
-        <ul style="margin-left: 20px;margin-bottom: 10px;">
-          <li style="padding: 5px 0px;"><span style="color: green;">BIDV</span>: Nguyễn Hải Đăng, STK: 63510001079790</li>
-          <li style="padding: 5px 0px;"><span style="color: green;">BIDV</span>: Đào Thế Quân, STK: 63510001062301</li>
-          <!-- <li style="padding: 5px 0px;"><span style="color: green;">MoMo</span>: <a style="color: #495060;" target="_blank" href="https://me.momo.vn/nguyenvanhieu">me.momo.vn/nguyenvanhieu</a></li>
-          <li style="padding: 5px 0px;"><span style="color: green;">Paypal</span>: <a style="color: #495060;" target="_blank" href="https://www.paypal.me/nguyenvanhieuvn">paypal.me/nguyenvanhieuvn</a></li> -->
-        </ul>
-        Nếu thấy website hữu ích, hãy chia sẻ tới bạn bè để cùng nhau học tập và tiến bộ mỗi ngày nhé!
       </Card>
     </div>
   
@@ -635,13 +635,16 @@
   }
 
   .flex-container {
+    display: flex;
+    flex-direction: column;
     #problem-main {
-      flex: auto;
+      display: flex;
       margin-right: 18px;
     }
-    #right-column {
-      flex: none;
-      width: 300px;
+    #sub-content {
+      display: flex;
+      width: 95vw;
+      margin-top: 5%;
     }
   }
 
@@ -681,8 +684,7 @@
   }
 
   #submit-code {
-    margin-top: 20px;
-    margin-bottom: 20px;
+    width: 45vw;
     .status {
       float: left;
       cursor: pointer;
@@ -702,8 +704,6 @@
   }
 
   #info {
-    margin-bottom: 20px;
-    margin-top: 20px;
     ul {
       list-style-type: none;
       li {
