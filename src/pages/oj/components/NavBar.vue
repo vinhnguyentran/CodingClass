@@ -48,7 +48,7 @@
       </Submenu>
       <template v-if="!isAuthenticated">
         <div class="btn-menu">
-          <Submenu name="noti" v-if="isAuthenticated">
+          <Submenu name="noti">
             <template slot="title">
               <Icon type="md-notifications" style="font-size: 24px; border-style: none;"/>
             </template>

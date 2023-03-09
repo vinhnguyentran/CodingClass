@@ -1,5 +1,6 @@
 <template>
-  <Row type="flex" :gutter="18">
+  <div>
+    <Row type="flex" :gutter="18" class="desktop">
     <Col :span="containerSpan">
       <Row v-if="!isContest" type="flex" :gutter="10" style="margin-top: 0px;">
             <Col :span="12">
@@ -12,8 +13,8 @@
                 </ul>
               </Panel>
             </Col>
-            <Col  :span="12">
-              <Panel shadow style="padding: 10px;padding-bottom: 10px;">
+            <Col :span="12">
+              <Panel shadow style="padding: 10px;padding-bottom: 10px;" >
                 <div slot="title" style="margin-left: -10px 0px 0px -20px;"><Icon type="md-pricetags" /> {{$t('m.TagsTitle')}}</div>
                 <Button v-for="tag in tagList"
                         :key="tag.name"
@@ -60,7 +61,69 @@
       </Panel>
     </Col>
   </Row>
-  
+  <div class="mobile">
+    <Col :span="24" style="width: 100%;">
+      <Row v-if="!isContest" type="flex" :gutter="10" style="margin-top: 0px;">
+            <Col :span="24" style="margin-bottom: 24px;">
+              <Panel shadow style="padding-top: 0px;padding-bottom: 10px;">
+                <div slot="title" style="margin-left: -10px;margin-bottom: -10px;"><Icon type="md-document" /> Bài tập mới</div>
+                <ul style="margin-left: 40px;margin-bottom: 20px;">
+                  <li style="padding: 5px 0px;"  v-for="p in problemList" :key="p.id">
+                    <a class="link-style" :href="'/problem/' + p._id">{{p._id}} - {{p.title}}  <Button class="news_noti" v-if="p.create_time == maxDate">News</Button></a>
+                  </li>
+                </ul>
+              </Panel>
+            </Col>
+            <Col :span="24"  style="margin-bottom: 24px;">
+              <Panel shadow style="padding: 10px;padding-bottom: 10px;" >
+                <div slot="title" style="margin-left: -10px 0px 0px -20px;"><Icon type="md-pricetags" /> {{$t('m.TagsTitle')}}</div>
+                <Button v-for="tag in tagList"
+                        :key="tag.name"
+                        :disabled="query.tag === tag.name"
+                        shape="circle"
+                        class="tag-btn"><a class="link-style" :href="'/problem?tag=' + tag.name">{{tag.name}}</a>
+                </Button>
+              </Panel>
+            </Col>
+      </Row>
+    </Col>
+    <Col :span="24" v-if="!isContest" >
+      <Panel shadow>
+        <div style="font-size:14px; text-align:center; width:100%; line-height:16px; background: transparent; color:#636e72;">Rủ bạn bè vào cày rank thôi nào!</div>
+        <div class="today">
+          <div class="nowWeek">{{nowWeek}}</div>
+          <div class="nowDate">
+            {{nowDate}}
+          </div>
+        </div>
+        <div v-if="days" style="margin:0 auto; margin-bottom:15px; font-size:12px; text-align:center; width:160px; line-height:16px; background: transparent; color:#636e72;">Bạn đã có <strong>{{days}} </strong> chuỗi ngày học</div>
+        <div style="margin-top:-10px; margin:0 auto; font-size:14px; text-align:justify; width:80%; line-height:16px; background: transparent; color:#636e72;">{{word}}</div>
+        <Button v-if="!SighinStatus" type="primary" icon="ios-alarm" @click="Sighin" long style="margin-top:20px; margin-bottom:20px; margin-left:10%; width:80%;">Ghi danh</Button>
+        <Button v-else type="primary" icon="ios-alarm" long disabled style="margin-top:20px; margin-bottom:20px; margin-left:10%; width:80%;">
+            Ghi danh
+        </Button>
+      </Panel>
+      <Panel shadow style="margin-top: 37px;padding-bottom: 5px;">
+        <div slot="title" style="margin-left: -10px;margin-bottom: -10px;"><Icon type="ios-link" /> {{$t('m.Similar_Site')}}</div>
+        <ul style="margin-left: 40px;margin-bottom: 20px;">
+          <li style="padding: 5px 0px;"><a href="" class="link-style" onclick="event.preventDefault();window.open('https://dqcoder.info', '_blank');">DQ Blog 📰</a></li>
+          <li style="padding: 5px 0px;"><a href="" class="link-style" onclick="event.preventDefault();window.open('http://c3nguyenchithanh.daknong.edu.vn/', '_blank');">C3 Nguyễn Chí Thanh 🏫</a></li>
+          <li style="padding: 5px 0px;"><a href="" class="link-style" onclick="event.preventDefault();window.open('https://www.facebook.com/nguyen.khuong.16', '_blank');">GV Nguyễn Đình Khương</a></li>
+        </ul>
+      </Panel>
+      <Panel shadow style="margin-top: 37px;padding-bottom: 5px;">
+        <div slot="title" style="margin-left: -10px;margin-bottom: -10px;"><Icon type="md-stats" /> {{$t('m.Statistics')}}</div>
+        <ul style="margin-left: 40px;margin-bottom: 20px;">
+            <li style="padding: 5px 0px;"><a href="" class="link-style" onclick="event.preventDefault();">Số lượng bài tập: {{problem_count}}</a></li>
+            <li style="padding: 5px 0px;"><a href="" class="link-style" onclick="event.preventDefault();">Tổng số bài nộp: overflow</a></li>
+            <li style="padding: 5px 0px;"><a href="" class="link-style" onclick="event.preventDefault();">Số lượng thành viên: {{infoData.user_count}}</a></li>
+            <li style="padding: 5px 0px;"><a href="" class="link-style" onclick="event.preventDefault();">Số bài nộp hôm nay: {{infoData.today_submission_count}}</a></li>
+        </ul>
+      </Panel>
+    </Col>
+  </div>
+  </div>
+ 
 </template>
 
 <script>
@@ -141,12 +204,13 @@
         let newArr = []
         for (let i = 1; i < dates.length; i++) {
           newArr.push(dates[i].create_time)
-        }console.log('log2', newArr)
+        }
         this.maxDate = new Date(Math.max(...newArr.map(element => {
           // console.log('log', new Date(element.create_time))
           return new Date(element.create_time)
         })
         ))
+        console.log('log2', this.maxDate)
       },
       fDate (s) {
         s = s.split('T')
@@ -264,6 +328,29 @@
     border-radius: 10px;
     border-style: none;
   }
+  .mobile{
+    display: none;
+  }
+  .desktop{
+    display: flex;
+  }
+  @media only screen and (max-width: 600px) {
+    .col{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        .col-span-12{
+          max-width: 100%;
+        }
+    }
+    .desktop{
+      display: none;
+    }
+    .mobile{
+      display: flex;
+      flex-direction: column;
+    }
+}
   .announcements-container {
     margin-top: -10px;
     margin-bottom: 10px;

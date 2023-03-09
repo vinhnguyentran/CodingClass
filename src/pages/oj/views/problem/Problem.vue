@@ -9,9 +9,16 @@
     <div id="problem-main">
       <!--problem main-->
       <Panel :padding="40" shadow style="width: 50vw;">
+        <div class="tab">
+          <button class="tablinks" @click="openCity(e, 0)">{{$t('m.Description')}}</button>
+          <button class="tablinks" @click="openCity(e, 1)">{{$t('m.Submit')}}</button>
+          <button class="tablinks" @click="openCity(e, 2)">{{$t('m.Information_Problem')}}</button>
+          <button class="tablinks" @click="openCity(e, 3)">{{$t('m.Statistic')}}</button>
+          <button class="tablinks" @click="openCity(e, 4)">Bài tập tương tự</button>
+        </div>
         <div class="report"><a title="Báo lỗi bài tập này" target="_blank" onclick="event.preventDefault();window.open('https://www.facebook.com/he1deng', '_blank');" rel="noreferrer nofollow noopener"><i class="ivu-icon ivu-icon-md-bug"></i> {{$t('m.Report')}}</a></div>
         <h2 slot="title" class="problem-title">{{problem._id}} - {{problem.title}}</h2>
-        <div id="problem-content" class="markdown-body" v-katex>
+        <div id="problem-content" class="markdown-body" v-katex v-if="tab_id == 0">
           <h3 class="title">{{$t('m.Description')}}</h3>
           <p class="content" v-html=problem.description></p>
           <!-- {{$t('m.music')}} -->
@@ -61,6 +68,107 @@
           </div>
 
         </div>
+        <VerticalMenu @on-click="handleRoute" style="cursor: pointer; width: 100%; height: 500px;" id="tab2" v-if="tab_id == 1">
+        <template v-if="this.contestID">
+          <VerticalMenu-item :route="{name: 'contest-problem-list', params: {contestID: contestID}}">
+            <Icon type="ios-photos"></Icon>
+            {{$t('m.Problems')}}
+          </VerticalMenu-item>
+
+          <VerticalMenu-item :route="{name: 'contest-announcement-list', params: {contestID: contestID}}">
+            <Icon type="md-chatbubbles"></Icon>
+            {{$t('m.Announcements')}}
+          </VerticalMenu-item>
+        </template>
+
+        <template v-if="!this.contestID">
+          <VerticalMenu-item v-if="!this.contestID || OIContestRealTimePermission" onclick="let e = document.getElementById('submit-code');window.scrollTo(0, e.offsetTop);">
+            <Icon type="md-cloud-upload"></Icon>
+              {{$t('m.Submit')}}
+          </VerticalMenu-item>
+          <VerticalMenu-item v-if="!this.contestID || OIContestRealTimePermission" :route="submissionRoute">
+            <Icon type="md-menu"></Icon>
+              {{$t('m.Submissions')}}
+          </VerticalMenu-item>
+        </template>
+
+        <template v-if="this.contestID">
+          <VerticalMenu-item v-if="!this.contestID || OIContestRealTimePermission"
+                             :route="{name: 'contest-rank', params: {contestID: contestID}}">
+            <Icon type="md-stats"></Icon>
+            {{$t('m.Rankings')}}
+          </VerticalMenu-item>
+          <VerticalMenu-item :route="{name: 'contest-details', params: {contestID: contestID}}">
+            <Icon type="md-home"></Icon>
+            {{$t('m.View_Contest')}}
+          </VerticalMenu-item>
+        </template>
+      </VerticalMenu>
+
+      <Card id="info" style="width: 100%; height: 500px;" v-if="tab_id == 2">
+        <div slot="title" class="header">
+          <Icon type="md-information-circle"></Icon>
+          <span class="card-title">{{$t('m.Information_Problem')}}</span>
+        </div>
+        <ul>
+          <li><p>ID</p>
+            <p>{{problem._id}}</p></li>
+          <li>
+            <p>{{$t('m.Time_Limit')}}</p>
+            <p>{{problem.time_limit}}MS</p></li>
+          <li>
+            <p>{{$t('m.Memory_Limit')}}</p>
+            <p>{{problem.memory_limit}}MB</p></li>
+          <li>
+            <p>{{$t('m.IOMode')}}</p>
+            <p>{{problem.io_mode.io_mode}}</p>
+          </li>
+          <li>
+            <p>{{$t('m.Created')}}</p>
+            <p>{{problem.created_by.username}}</p></li>
+          <li v-if="problem.difficulty">
+            <p>{{$t('m.Level')}}</p>
+            <p>{{$t('m.' + problem.difficulty)}}</p></li>
+          <li v-if="problem.total_score">
+            <p>{{$t('m.Score')}}</p>
+            <p>{{problem.total_score}}</p>
+          </li>
+          <li>
+            <p>{{$t('m.Tags')}}</p>
+            <p>
+              <Poptip trigger="hover" placement="left-end">
+                <a>{{$t('m.Show')}}</a>
+                <div slot="content">
+                  <Tag style="cursor: pointer;" v-for="tag in problem.tags" :key="tag" @click.native="handleRoute('/problem?tag=' + tag)">
+                    {{tag}}
+                  </Tag>
+                </div>
+              </Poptip>
+            </p>
+          </li>
+        </ul>
+      </Card>
+
+      <Card id="pieChart" :padding="0" v-if="tab_id == 3" style="width: 100%; height: 500px;">
+        <div slot="title">
+          <Icon type="ios-analytics"></Icon>
+          <span class="card-title">{{$t('m.Statistic')}}</span>
+          <Button size="small" id="detail" @click="graphVisible = !graphVisible">{{$t('m.Details')}}</Button>
+        </div>
+        <div class="echarts">
+          <ECharts :options="pie"></ECharts>
+        </div>
+      </Card>
+      <Card style="width: 100%; height: 500px;" :padding="0" v-if="tab_id == 4" id="tab5">
+        <div slot="title" style="font-size: 16px"><i data-v-20c86fbe="" class="ivu-icon ivu-icon-md-document"></i>
+        <span class="card-title">Bài tập tương tự</span>
+        </div>
+        <ul style="margin-left: 30px;margin-bottom: 20px;">
+          <li style="padding: 5px 0px;"  v-for="p in problemList" :key="p.id">
+            <a class="link-style" :href="'/problem/' + p._id">{{p._id}} - {{p.title}}</a>
+          </li>
+        </ul>
+      </Card>
       </Panel>
       <!--problem main end-->
       <Card :padding="20" id="submit-code" ref="submit-code" dis-hover>
@@ -123,132 +231,13 @@
         <ul style="margin-left: 20px;margin-bottom: 10px;">
           <li style="padding: 5px 0px;"><span style="color: green;">BIDV</span>: Nguyễn Hải Đăng, STK: 63510001079790</li>
           <li style="padding: 5px 0px;"><span style="color: green;">BIDV</span>: Đào Thế Quân, STK: 63510001062301</li>
-          <!-- <li style="padding: 5px 0px;"><span style="color: green;">MoMo</span>: <a style="color: #495060;" target="_blank" href="https://me.momo.vn/nguyenvanhieu">me.momo.vn/nguyenvanhieu</a></li>
-          <li style="padding: 5px 0px;"><span style="color: green;">Paypal</span>: <a style="color: #495060;" target="_blank" href="https://www.paypal.me/nguyenvanhieuvn">paypal.me/nguyenvanhieuvn</a></li> -->
         </ul>
         Nếu thấy website hữu ích, hãy chia sẻ tới bạn bè để cùng nhau học tập và tiến bộ mỗi ngày nhé!
       </Card>
       </Card>
-      <!-- <Card :padding="20" dis-hover>
-        <h3 style="font-size: 20px;">Bình luận</h3>
-        <ul style="margin-left: 30px;margin-top: 20px;">
-          <li><a rel="nofollow noopener noreferrer" target="_blank" class="animation-text" href="https://gist.github.com/nguyenvanhieuvn/d3e5e20c44ef9d565fa3d7b9ebabfc65">Quy tắc thảo luận &#38; hướng dẫn đăng bình luận ✍️</a></li>
-          <li><span style="font-weight: 600;">NÊN</span> thảo luận giải pháp 😘, <span style="font-weight: 600;">KHÔNG NÊN</span> chia sẻ code 😐</li>
-          <li title="Không khuyến khích các bạn chia sẻ lời giải nha">Mọi source code đăng mà không được ẩn sẽ bị BOT xóa tự động 😭</li>
-          <li title="BOT của Luyện Code cũng sẽ thường xuyên kiểm duyệt nha"><span style="font-weight: 600;">KHÔNG NÊN</span> để lộ thông tin cá nhân (SĐT, email, Facebook, ...)</li>
-          <li>Tham gia thảo luận bài tập tại
-            <span style="position: relative;">
-              <a href="https://discord.gg/hpeRrbccfZ" target="_blank" style="position: absolute; left: 10px">
-                <img alt="Discord" src="https://img.shields.io/discord/879371214806712340?label=Discord&logo=Discord">
-              </a>
-            </span>
-          </li>
-        </ul>
-        <script type="application/javascript" src="https://utteranc.es/client.js" repo="luyencode/comments" issue-term="url" theme="github-light" crossorigin="anonymous" async> </script>
-      </Card> -->
     </div>
     <div id="sub-content">
-      <VerticalMenu @on-click="handleRoute" style="cursor: pointer; width: 25%; height: 500px;">
-        <template v-if="this.contestID">
-          <VerticalMenu-item :route="{name: 'contest-problem-list', params: {contestID: contestID}}">
-            <Icon type="ios-photos"></Icon>
-            {{$t('m.Problems')}}
-          </VerticalMenu-item>
-
-          <VerticalMenu-item :route="{name: 'contest-announcement-list', params: {contestID: contestID}}">
-            <Icon type="md-chatbubbles"></Icon>
-            {{$t('m.Announcements')}}
-          </VerticalMenu-item>
-        </template>
-
-        <template v-if="!this.contestID">
-          <VerticalMenu-item v-if="!this.contestID || OIContestRealTimePermission" onclick="let e = document.getElementById('submit-code');window.scrollTo(0, e.offsetTop);">
-            <Icon type="md-cloud-upload"></Icon>
-              {{$t('m.Submit')}}
-          </VerticalMenu-item>
-          <VerticalMenu-item v-if="!this.contestID || OIContestRealTimePermission" :route="submissionRoute">
-            <Icon type="md-menu"></Icon>
-              {{$t('m.Submissions')}}
-          </VerticalMenu-item>
-        </template>
-
-        <template v-if="this.contestID">
-          <VerticalMenu-item v-if="!this.contestID || OIContestRealTimePermission"
-                             :route="{name: 'contest-rank', params: {contestID: contestID}}">
-            <Icon type="md-stats"></Icon>
-            {{$t('m.Rankings')}}
-          </VerticalMenu-item>
-          <VerticalMenu-item :route="{name: 'contest-details', params: {contestID: contestID}}">
-            <Icon type="md-home"></Icon>
-            {{$t('m.View_Contest')}}
-          </VerticalMenu-item>
-        </template>
-      </VerticalMenu>
-
-      <Card id="info" style="width: 25%; height: 500px;">
-        <div slot="title" class="header">
-          <Icon type="md-information-circle"></Icon>
-          <span class="card-title">{{$t('m.Information_Problem')}}</span>
-        </div>
-        <ul>
-          <li><p>ID</p>
-            <p>{{problem._id}}</p></li>
-          <li>
-            <p>{{$t('m.Time_Limit')}}</p>
-            <p>{{problem.time_limit}}MS</p></li>
-          <li>
-            <p>{{$t('m.Memory_Limit')}}</p>
-            <p>{{problem.memory_limit}}MB</p></li>
-          <li>
-            <p>{{$t('m.IOMode')}}</p>
-            <p>{{problem.io_mode.io_mode}}</p>
-          </li>
-          <li>
-            <p>{{$t('m.Created')}}</p>
-            <p>{{problem.created_by.username}}</p></li>
-          <li v-if="problem.difficulty">
-            <p>{{$t('m.Level')}}</p>
-            <p>{{$t('m.' + problem.difficulty)}}</p></li>
-          <li v-if="problem.total_score">
-            <p>{{$t('m.Score')}}</p>
-            <p>{{problem.total_score}}</p>
-          </li>
-          <li>
-            <p>{{$t('m.Tags')}}</p>
-            <p>
-              <Poptip trigger="hover" placement="left-end">
-                <a>{{$t('m.Show')}}</a>
-                <div slot="content">
-                  <Tag style="cursor: pointer;" v-for="tag in problem.tags" :key="tag" @click.native="handleRoute('/problem?tag=' + tag)">
-                    {{tag}}
-                  </Tag>
-                </div>
-              </Poptip>
-            </p>
-          </li>
-        </ul>
-      </Card>
-
-      <Card id="pieChart" :padding="0" v-if="!this.contestID || OIContestRealTimePermission" style="width: 25%; height: 500px;">
-        <div slot="title">
-          <Icon type="ios-analytics"></Icon>
-          <span class="card-title">{{$t('m.Statistic')}}</span>
-          <Button size="small" id="detail" @click="graphVisible = !graphVisible">{{$t('m.Details')}}</Button>
-        </div>
-        <div class="echarts">
-          <ECharts :options="pie"></ECharts>
-        </div>
-      </Card>
-      <Card style="width: 25%; height: 500px;" :padding="0" v-if="!this.contestID || OIContestRealTimePermission">
-        <div slot="title" style="font-size: 16px"><i data-v-20c86fbe="" class="ivu-icon ivu-icon-md-document"></i>
-        <span class="card-title">Bài tập tương tự</span>
-        </div>
-        <ul style="margin-left: 30px;margin-bottom: 20px;">
-          <li style="padding: 5px 0px;"  v-for="p in problemList" :key="p.id">
-            <a class="link-style" :href="'/problem/' + p._id">{{p._id}} - {{p.title}}</a>
-          </li>
-        </ul>
-      </Card>
+     
     </div>
   
     <Modal v-model="graphVisible">
@@ -287,6 +276,7 @@
         submissionExists: false,
         problemList: [],
         problemLimit: 10,
+        tab_id: 0,
         query: {
           keyword: '',
           difficulty: '',
@@ -398,6 +388,9 @@
         }, () => {
           this.$Loading.error()
         })
+      },
+      openCity (event, tabName) {
+        this.tab_id = tabName
       },
       getProblemList () {
         let offset = 0
@@ -628,6 +621,42 @@
   .card-title {
     margin-left: 8px;
   }
+  .tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+  margin-bottom: 24px;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
   .problem-title {
     text-align: center;
     font-size: 1.1em;
@@ -649,7 +678,7 @@
   }
 
   #problem-content {
-    margin-top: -50px;
+    margin-top: 50px;
     word-break: break-word;
     .title {
       font-size: 20px;
