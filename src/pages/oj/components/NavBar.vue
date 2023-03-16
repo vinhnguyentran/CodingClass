@@ -114,7 +114,7 @@
         </Dropdown>
       </template>
     </Menu>
-    <Modal v-model="modalVisible" :width="400" background="red">
+    <Modal v-model="modalVisible" :width="600" background="red">
       <div slot="header" class="modal-title">{{$t('m.Welcome_to')}} {{website.website_name_shortcut}}</div>
       <component :is="modalStatus.mode" v-if="modalVisible"></component>
       <div slot="footer" style="display: none"></div>
@@ -235,7 +235,6 @@
     .oj-menu {
       background: #fdfdfd;
     }
-
     .logo {
       margin-left: 2%;
       margin-right: 2%;
@@ -243,7 +242,6 @@
       float: left;
       height: 60px;
     }
-
     .drop-menu {
       float: right;
       margin-right: 30px;
@@ -268,7 +266,6 @@
       }
     }
   }
-
   .modal {
     &-title {
       font-size: 18px;
@@ -279,5 +276,6 @@
   .ivu-modal-content{
     background-image: url('../../../../static/img/background.png');
     background-size: cover;
+    width: 600px;
   }
 </style>

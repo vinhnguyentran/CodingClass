@@ -1,42 +1,57 @@
 <template>
   <div>
-    <Form ref="formLogin" :model="formLogin" :rules="ruleLogin">
-      <FormItem prop="username">
-        <Input type="text" v-model="formLogin.username" :placeholder="$t('m.LoginUsername')" size="large" @on-enter="handleLogin">
-        <Icon type="ios-person-outline" slot="prepend"></Icon>
-        </Input>
-      </FormItem>
-      <FormItem prop="password">
-        <Input type="password" v-model="formLogin.password" :placeholder="$t('m.LoginPassword')" size="large" @on-enter="handleLogin">
-        <Icon type="ios-lock-outline" slot="prepend"></Icon>
-        </Input>
-      </FormItem>
-      <FormItem prop="tfa_code" v-if="tfaRequired">
-        <Input v-model="formLogin.tfa_code" :placeholder="$t('m.TFA_Code')">
-        <Icon type="ios-lightbulb-outline" slot="prepend"></Icon>
-        </Input>
-      </FormItem>
-    </Form>
+    <div class="modal-login">
+      <div class="left-login">
+        <!-- <carousel :slides="slides"></carousel> -->
+        <img :src="`https://picsum.photos/id/${idImage}/200/300`" />
+      </div>
+      <div class="form">
+        <Form ref="formLogin" :model="formLogin" :rules="ruleLogin">
+          <FormItem prop="username">
+            <Input type="text" v-model="formLogin.username" :placeholder="$t('m.LoginUsername')" size="large" @on-enter="handleLogin">
+            <Icon type="ios-person-outline" slot="prepend"></Icon>
+            </Input>
+          </FormItem>
+          <FormItem prop="password">
+            <Input type="password" v-model="formLogin.password" :placeholder="$t('m.LoginPassword')" size="large" @on-enter="handleLogin">
+            <Icon type="ios-lock-outline" slot="prepend"></Icon>
+            </Input>
+          </FormItem>
+          <FormItem prop="tfa_code" v-if="tfaRequired">
+            <Input v-model="formLogin.tfa_code" :placeholder="$t('m.TFA_Code')">
+            <Icon type="ios-lightbulb-outline" slot="prepend"></Icon>
+            </Input>
+          </FormItem>
+          <Button
+            type="primary"
+            @click="handleLogin"
+            class="btn" long
+            :loading="btnLoginLoading">
+            {{$t('m.UserLogin')}}
+          </Button>
+          <br>
+        </Form>
+        <el-row class="login-method">
+            <el-col>
+              <!-- <img src="../../../../../static/img/GoogleLogo.png" class="logo-icon"/> -->
+            </el-col>
+            <el-col>
+              <!-- <img src="../../../../../static/img/FacebookLogo.png" style="width: 30px;height: 30px; position: absolute; margin-left: 25%;" /> -->
+              <facebookLogin class="button"
+                appId="326022817735322"
+                @login="getUserData"
+                @logout="onLogout"
+                @get-initial-status="getUserData" 
+                >
+              </facebookLogin>
+            </el-col>
+            <el-col>
+              <!-- <img src="../../../../../static/img/GithubLogo.png" class="logo-icon"/> -->
+            </el-col>
+          </el-row>
+      </div>
+    </div>
     <div class="footer">
-      <Button
-        type="primary"
-        @click="handleLogin"
-        class="btn" long
-        :loading="btnLoginLoading">
-        {{$t('m.UserLogin')}}
-      </Button>
-      <el-row class="row-icon">
-        <el-col>
-          <img src="../../../../../static/img/GoogleLogo.png" class="logo-icon"/>
-        </el-col>
-        <el-col>
-          <img src="../../../../../static/img/FacebookLogo.png" style="width: 30px;height: 30px;"/>
-        </el-col>
-        <el-col>
-          <img src="../../../../../static/img/GithubLogo.png" class="logo-icon"/>
-        </el-col>
-      </el-row>
-      <br>
       <a v-if="website.allow_register" @click.stop="handleBtnClick('register')">{{$t('m.No_Account')}}</a>
       <a @click.stop="goResetPassword" style="float: right">{{$t('m.Forget_Password')}}</a>
     </div>
@@ -47,9 +62,14 @@
   import { mapGetters, mapActions } from 'vuex'
   import api from '@oj/api'
   import { FormMixin } from '@oj/components/mixins'
-
+  import facebookLogin from 'facebook-login-vuejs'
+  // import Carousel from '../../components/Carousel.vue'
   export default {
     mixins: [FormMixin],
+    components: {
+      facebookLogin
+      // Carousel
+    },
     data () {
       const CheckRequiredTFA = (rule, value, callback) => {
         if (value !== '') {
@@ -59,10 +79,10 @@
         }
         callback()
       }
-
       return {
         tfaRequired: false,
         btnLoginLoading: false,
+        idImage: 1,
         formLogin: {
           username: '',
           password: '',
@@ -86,6 +106,9 @@
           mode,
           visible: true
         })
+      },
+      loginWithF (title) {
+        console.log(title)
       },
       handleLogin () {
         this.validateForm('formLogin').then(valid => {
@@ -129,14 +152,32 @@
     margin-top: 20px;
     margin-bottom: -15px;
     text-align: left;
-    .btn {
-      margin: 0 0 15px 0;
-      &:last-child {
-        margin: 0;
-      }
-    }
+    justify-content: center;
     a{
       color: aliceblue;
+    }
+  }
+  .form{
+    float: left;
+  }
+  .left-login{
+    width: 50%;
+    max-height: 500px;
+    min-height: 300px;
+    img{
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 1px 2px 5px #eee275;
+    }
+  }
+  .btn {
+      margin: auto;
+    }
+  .modal-login{
+    display: flex;
+    justify-content: space-between;
+    Form{
+      margin-top: 10%;
     }
   }
   .logo-icon{
@@ -145,8 +186,8 @@
     border-radius: 50%
   }
 
-  .row-icon{
-    margin: auto;
+  .login-method{
+    margin: 10% auto;
     display: flex;
     justify-content: space-around;
     width: 60%;

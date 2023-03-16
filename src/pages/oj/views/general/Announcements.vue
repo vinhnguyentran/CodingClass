@@ -130,7 +130,6 @@
   import api from '@oj/api'
   import Pagination from '@oj/components/Pagination'
   import { mapState } from 'vuex'
-
   export default {
     name: 'Announcement',
     components: {
@@ -390,16 +389,13 @@
       }
     }
   }
-
   .content-container {
     padding: 0 20px 20px 20px;
   }
-
   .no-announcement {
     text-align: center;
     font-size: 16px;
   }changeLocale
-
   .announcement-animate-enter-active {
     color: rgba(255, 255, 255, 0.5);
     animation: fadeIn 1s;
