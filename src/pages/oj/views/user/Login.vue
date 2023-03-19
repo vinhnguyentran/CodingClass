@@ -37,8 +37,9 @@
             </el-col>
             <el-col>
               <!-- <img src="../../../../../static/img/FacebookLogo.png" style="width: 30px;height: 30px; position: absolute; margin-left: 25%;" /> -->
+              <!-- 326022817735322 -->
               <facebookLogin class="button"
-                appId="326022817735322"
+                appId="314930319788683"
                 @login="getUserData"
                 @logout="onLogout"
                 @get-initial-status="getUserData" 
@@ -106,6 +107,12 @@
           mode,
           visible: true
         })
+      },
+      getUserData (user) {
+        // const { authResponse } = new Promise(user.FB.login)
+        // if (!authResponse) return
+        // apiAuthenticate(authResponse.accessToken);
+        console.log('log info:', user)
       },
       loginWithF (title) {
         console.log(title)

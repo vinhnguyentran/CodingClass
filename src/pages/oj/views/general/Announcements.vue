@@ -329,9 +329,11 @@
   }
   .mobile{
     display: none;
+    height: 90vh;
   }
   .desktop{
     display: flex;
+    height: 90vh;
   }
   @media only screen and (max-width: 600px) {
     .col{

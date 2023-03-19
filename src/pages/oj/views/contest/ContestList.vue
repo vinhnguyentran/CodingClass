@@ -186,6 +186,7 @@
 </script>
 <style lang="less" scoped>
   #contest-card {
+    height: 80vh;
     #keyword {
       width: 80%;
       margin-right: 30px;

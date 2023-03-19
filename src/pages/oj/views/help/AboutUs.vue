@@ -1,5 +1,5 @@
 <template>
-  <panel>
+  <panel style="height: 90vh;">
     <div slot="title">{{$t('m.AboutUs')}}</div>
     <div v-katex v-html="aboutus.content" class="content markdown-body"></div>
 	<p></p>

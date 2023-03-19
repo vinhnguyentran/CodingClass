@@ -8,7 +8,7 @@
   <div class="flex-container">
     <div id="problem-main">
       <!--problem main-->
-      <Panel :padding="40" shadow style="width: 50vw;">
+      <Panel :padding="40" shadow class="left-col">
         <div class="tab">
           <button class="tablinks" @click="openCity(e, 0)">{{$t('m.Description')}}</button>
           <button class="tablinks" @click="openCity(e, 1)">{{$t('m.Submit')}}</button>
@@ -621,6 +621,21 @@
   .card-title {
     margin-left: 8px;
   }
+  .left-col{
+    width: 50vw;
+  }
+  @media only screen and (max-width: 600px) {
+  .left-col{
+    width: 100%;
+    }
+  #problem-main {
+      display: flex;
+      flex-direction: column;
+      #submit-code{
+        width: 100%;
+      } 
+    }
+  }
   .tab {
   overflow: hidden;
   border: 1px solid #ccc;
@@ -665,10 +680,8 @@
 
   .flex-container {
     display: flex;
-    flex-direction: column;
     #problem-main {
       display: flex;
-      margin-right: 18px;
     }
     #sub-content {
       display: flex;
@@ -713,7 +726,7 @@
   }
 
   #submit-code {
-    width: 45vw;
+    width: 50vw;
     .status {
       float: left;
       cursor: pointer;
